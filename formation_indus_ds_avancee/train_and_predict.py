@@ -4,7 +4,6 @@ import time
 import joblib
 import mlflow
 import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
 
 
 def train_model_with_io(features_path: str, model_registry_folder: str) -> None:
