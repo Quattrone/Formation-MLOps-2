@@ -2,7 +2,6 @@ import os
 import time
 
 import joblib
-import mlflow
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 
@@ -14,24 +13,12 @@ def train_model_with_io(features_path: str, model_registry_folder: str) -> None:
 
 
 def train_model(features: pd.DataFrame, model_registry_folder: str) -> None:
-    mlflow.set_tracking_uri("http://0.0.0.0:49795")
-    mlflow.set_experiment(f"experiment_{time.strftime('%Y%m%d-%H%M%S')}")
     target = 'Ba_avg'
     X = features.drop(columns=[target])
     y = features[target]
-    with mlflow.start_run():
-        mlflow.sklearn.autolog(log_models=False)
-        model = RandomForestRegressor(n_estimators=1, max_depth=10, n_jobs=1)
-        model.fit(X, y)
-    
-        mlflow.sklearn.log_model(
-                sk_model=model,
-                artifact_path="sklearn_model",
-                registered_model_name="sklearn_model"
-            )
-        
-    time_str = time.strftime('%Y%m%d-%H%M%S')
-    joblib.dump(model, os.path.join(model_registry_folder, time_str + '.joblib'))
+    model = RandomForestRegressor(n_estimators=1, max_depth=10, n_jobs=1)
+    model.fit(X, y)
+    joblib.dump(model, os.path.join(model_registry_folder, 'model_latest.joblib'))
 
 
 def predict_with_io(features_path: str, model_path: str, predictions_folder: str) -> None:
